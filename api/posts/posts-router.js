@@ -60,7 +60,7 @@ router.post('/api/posts', (req,res) => {
 router.put('/api/post/:id', (req,res) => {
     const {title, content} = req.body;
     if(!title || !content){
-        res.status(404).json({
+        res.status(400).json({
             message: "Please provide title and contents for the post"
         })
     } else{
@@ -111,8 +111,25 @@ router.delete('/api/post/:id', async (req,res) => {
         })
     }
 })
-router.get('/api/posts/:id/comments', (req,res) => {
-    //
+router.get('/api/posts/:id/comments', async (req,res) => {
+    try{
+        const id = req.params.id;
+        const getPost = await Posts.findById(id);
+        if(!getPost){
+            res.status(404).json({
+                message: "The post with the specified ID does not exist"
+            })
+        } else {
+            const comments = await Posts.findPostComments(id);
+            res.json(comments);
+        }
+    }
+    catch (err){
+        res.status(500).json({
+            message: "The post could not be removed",
+            err: err.message
+        })
+    }
 })
 
 module.exports = router;
