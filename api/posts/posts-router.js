@@ -58,7 +58,38 @@ router.post('/api/posts', (req,res) => {
     }
 })
 router.put('/api/post/:id', (req,res) => {
-    //
+    const {title, content} = req.body;
+    if(!title || !content){
+        res.status(404).json({
+            message: "Please provide title and contents for the post"
+        })
+    } else{
+        Posts.findById(req.params.id)
+        .then(newPost => {
+            if(!newPost){
+                res.status(404).json({
+                    message: "The post with the specified ID does not exist"
+                });
+            }
+            else{
+                return Posts.update(req.params.id, req.body);
+            }
+        })
+        .then(data => {
+            if(data){
+                return Posts.findById(req.params.id)
+            }
+        })
+        .then(post => {
+            res.status(200).json(post);
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "There was an error while saving the post to the database",
+                err: err.message
+            });
+        })
+    }
 })
 router.delete('/api/post/:id', async (req,res) => {
     try{
