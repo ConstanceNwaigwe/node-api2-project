@@ -39,7 +39,23 @@ router.get('/api/post/:id', async(req,res) => {
     }
 })
 router.post('/api/posts', (req,res) => {
-    //
+    const {title, content} = req.body;
+    if(!title || !content){
+        res.status(404).json({
+            message: "Please provide title and contents for the post"
+        })
+    } else{
+        Posts.insert({title, content})
+        .then(newPost => {
+            res.status(201).json(newPost);
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "There was an error while saving the post to the database",
+                err: err.message
+            });
+        })
+    }
 })
 router.put('/api/post/:id', (req,res) => {
     //
